@@ -4,17 +4,13 @@ import pandas as pd
 #int.from_bytes(b'\xff', 'big') << ! >> bytes([255])
 
 
-
-
-
 class DaFile:
     def __init__(self):
         
         # dataframe contains bytes of image 
         self.df = pd.DataFrame(index=[hex(0)], columns=[hex(i) for i in range(16)])
 
-        # counter of NaNs in dadaframe
-        self.cut = 0
+        
 
         
     def f_use(self, f):
@@ -56,7 +52,10 @@ class DaFile:
 
         ret = []
         TR = True
-        cut = 0
+        
+        # counter of NaNs in dadaframe
+        self.cut = 0
+        
         for i in range(16):
             byte = f.read(1)
             if byte: 
@@ -65,9 +64,9 @@ class DaFile:
             else:
                 TR = False
                 ret.append(np.nan)
-                cut +=1
-        cut = 16 - cut
-        return ret, TR, cut
+                self.cut +=1
+        
+        return ret, TR, self.cut
 
 
 
@@ -78,5 +77,6 @@ fl = open('1.jpg', 'rb')
 da_f = DaFile()
 da_f.f_use(fl)
 da_f.save_to_csv()
+
 #print(da_f.df)
 #__________________________________
