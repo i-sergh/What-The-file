@@ -23,7 +23,7 @@ class DaFile:
 
 
         while TR:
-            sxtnBytes,TR, self.cut = self.SixteenBytes(fl)
+            sxtnBytes,TR, self.cut = self.SixteenBytes(f)
 
 
             # why it's faster
@@ -71,12 +71,12 @@ class DaFile:
 
 
 # testing...
-fl = open('1.jpg', 'rb')
+#fl = open('1.jpg', 'rb')
 
 
-da_f = DaFile()
-da_f.f_use(fl)
-da_f.save_to_csv()
+#da_f = DaFile()
+#da_f.f_use(fl)
+#da_f.save_to_csv()
 
 #print(da_f.df)
 #__________________________________
