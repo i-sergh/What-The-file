@@ -62,50 +62,71 @@ def EntryClick(event):
 
 
 
-def MoveLeft():
+def MoveLeft(event):
     global COLS, ROWS
     global eX, eY
-    eX -=1
-    if eX < 0:
-        eX = COLS
-    if eX== 0 and eY == 0:
-        frame_hex_text.children['!entry'].focus()
-    else:
-        frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].focus()
+        
+    if event.widget.index(tk.INSERT)  == 0:
+        eX -=1
+        if eX < 0:
+            eX = COLS
+        if eX== 0 and eY == 0:
+            frame_hex_text.children['!entry'].focus()
+            frame_hex_text.children['!entry'].icursor(3)
+        else:
+            frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].focus()
+            frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(4)
+            
+        
 
-def MoveRight():
+def MoveRight(event):
     global COLS, ROWS
     global eX, eY
-    eX +=1
-    if eX > COLS:
-        eX = 0
-    if eX== 0 and eY == 0:
-        frame_hex_text.children['!entry'].focus()
-    else:
-        frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].focus()
 
-def MoveUp():
+    if event.widget.index(tk.INSERT)  == len(event.widget.get()):
+        eX +=1
+        if eX > COLS:
+            eX = 0
+        if eX== 0 and eY == 0:
+            frame_hex_text.children['!entry'].focus()
+            frame_hex_text.children['!entry'].icursor(3)
+            frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(0)
+        else:
+            frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].focus()
+            frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(4)
+            frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(0)
+
+
+        
+def MoveUp(event):
     global COLS, ROWS
     global eX, eY
+    
     eY -=1
     if eY < 0:
         eY = ROWS
     if eX== 0 and eY == 0:
         frame_hex_text.children['!entry'].focus()
+        frame_hex_text.children['!entry'].icursor(event.widget.index(tk.INSERT))
     else:
         frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].focus()
+        frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(event.widget.index(tk.INSERT))
+        
 
-def MoveDown():
+def MoveDown(event):
     global COLS, ROWS
     global eX, eY
+    
     eY +=1
     if eY > ROWS:
         eY = 0
     if eX== 0 and eY == 0:
         frame_hex_text.children['!entry'].focus()
+        frame_hex_text.children['!entry'].icursor(event.widget.index(tk.INSERT))
     else:
         frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].focus()
-
+        frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(event.widget.index(tk.INSERT))
+        
         
     
 root = tk.Tk()
@@ -163,12 +184,14 @@ for i in range(ROWS+2):
 
             entry_bytes.bind("<FocusIn>", lambda event: InFocus(event) )
             entry_bytes.bind("<FocusOut>",lambda event: OutOfFocus(event) )
-            entry_bytes.bind("<Left>", lambda event: MoveLeft())
-            entry_bytes.bind("<Right>", lambda event: MoveRight())
-            entry_bytes.bind("<Up>", lambda event: MoveUp())
-            entry_bytes.bind("<Down>", lambda event: MoveDown())
+            entry_bytes.bind("<Left>", lambda event: MoveLeft(event) )
+            entry_bytes.bind("<Right>", lambda event: MoveRight(event) )
+            entry_bytes.bind("<Up>", lambda event: MoveUp(event))
+            entry_bytes.bind("<Down>", lambda event: MoveDown(event) )
             root.bind('<Button-1>', EntryClick)        
 
 
-
+frame_hex_text.children['!entry'].focus()
+frame_hex_text.children['!entry'].icursor(10)
+print(frame_hex_text.children['!entry'].index(tk.INSERT))
 root.mainloop()
