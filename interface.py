@@ -1,5 +1,13 @@
 import tkinter as tk
 from byteread import DaFile
+import numpy as np
+fl = open('3.jpg', 'rb')
+da_f = DaFile()
+da_f.f_use(fl)
+print(da_f.df_rows)
+fl .close()
+df_page = da_f.page_load(20)
+
 
 
 def str_hex(num):
@@ -8,13 +16,14 @@ def str_hex(num):
     return '0' +num
     
 def InFocus(event):
-   
+    print(event.widget)
     event.widget.configure({"background": 'LightYellow2'})
+   
     
 def OutOfFocus(event):
-
+    
     event.widget.configure({"background": 'white'})
-
+    
 
 def EntryClick(event): 
     # честно спзженно отсюда: https://www.geeksforgeeks.org/python-tkinter-grid_location-and-grid_size-method/
@@ -59,7 +68,23 @@ def EntryClick(event):
         frame_hex_text.children['!entry'+ str(x + (COLS+1)*y+1)].focus()
     
     
-
+def e_fill(df_page):
+    global COLS, ROWS
+    for i in range(ROWS+1):
+        for j in range(COLS+1):
+            if i== 0 and j == 0:
+                frame_hex_text.children['!entry'].delete(0, 'end')
+                try:
+                    frame_hex_text.children['!entry'].insert(0,int(df_page[i][j]))
+                except:
+                    frame_hex_text.children['!entry'].insert(0,'')
+                        
+            else:
+                frame_hex_text.children['!entry'+ str(j + (COLS+1)*i+1)].delete(0, 'end')
+                try:
+                    frame_hex_text.children['!entry'+ str(j + (COLS+1)*i+1)].insert(0,int(df_page[i][j]))
+                except:
+                    frame_hex_text.children['!entry'].insert(0,'')
 
 
 def MoveLeft(event):
@@ -104,7 +129,12 @@ def MoveUp(event):
     
     eY -=1
     if eY < 0:
-        eY = ROWS
+        eY +=1
+        
+        df_page = da_f.pg_up()
+        
+        e_fill(df_page)
+
     if eX== 0 and eY == 0:
         frame_hex_text.children['!entry'].focus()
         frame_hex_text.children['!entry'].icursor(event.widget.index(tk.INSERT))
@@ -119,7 +149,15 @@ def MoveDown(event):
     
     eY +=1
     if eY > ROWS:
-        eY = 0
+        eY -=1
+        
+        df_page = da_f.pg_down()
+        
+        e_fill(df_page)
+                    #frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(event.widget.index(tk.INSERT))
+
+
+            
     if eX== 0 and eY == 0:
         frame_hex_text.children['!entry'].focus()
         frame_hex_text.children['!entry'].icursor(event.widget.index(tk.INSERT))
@@ -127,7 +165,15 @@ def MoveDown(event):
         frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].focus()
         frame_hex_text.children['!entry'+ str(eX + (COLS+1)*eY+1)].icursor(event.widget.index(tk.INSERT))
         
-        
+def testVal(inStr,acttyp):
+    #https://www.cyberforum.ru/python-graphics/thread2392322.html
+    if acttyp == '1':
+        if not inStr.isdigit():
+            return False
+    return True
+
+
+
     
 root = tk.Tk()
 
@@ -175,12 +221,19 @@ for i in range(ROWS+2):
                                                         width=4,
                                                         
                                                         font="Courier 12",
-                                                        justify='center'
+                                                        justify='center',
+                                                        validate='key'
                                                         )
             
-            entry_bytes.insert(0,str(i) + ' '+ str(j))
+            #entry_bytes.insert(0,str(i) + ' '+ str(j))
+            try:
+                entry_bytes.insert(0,int(df_page[i-1][j-1]))
+            except:
+                entry_bytes.insert(0,'')
             
             entry_bytes.grid(row=i, column=j,padx=1, pady=1)
+            
+            entry_bytes['validatecommand'] = (entry_bytes.register(testVal),'%P','%d')
 
             entry_bytes.bind("<FocusIn>", lambda event: InFocus(event) )
             entry_bytes.bind("<FocusOut>",lambda event: OutOfFocus(event) )
@@ -188,6 +241,7 @@ for i in range(ROWS+2):
             entry_bytes.bind("<Right>", lambda event: MoveRight(event) )
             entry_bytes.bind("<Up>", lambda event: MoveUp(event))
             entry_bytes.bind("<Down>", lambda event: MoveDown(event) )
+            
             root.bind('<Button-1>', EntryClick)        
 
 

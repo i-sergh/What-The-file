@@ -10,7 +10,7 @@ class DaFile:
         # dataframe contains bytes of image 
         self.df = pd.DataFrame(index=[hex(0)], columns=[hex(i) for i in range(16)])
 
-        
+        #self.df_da_page = np.nan
 
         
     def f_use(self, f):
@@ -19,7 +19,7 @@ class DaFile:
         TR = True
 
         # rows in df
-        i = 0
+        self.df_rows = 0
 
 
         while TR:
@@ -34,10 +34,38 @@ class DaFile:
         
             #df.write(bytes(sxtnBytes[0:cut]))       
         
-            self.df.loc[hex(i)] = sxtnBytes
+            self.df.loc[hex(self.df_rows)] = sxtnBytes
             
-            i +=1
+            self.df_rows +=1
+        
 
+    def page_load(self, ROWS=16, start_row = 0):
+        # load first page
+        
+        # maybe i do it next time
+        
+        #COLS = 15, 
+        #kt_df_rows = COLS * ROWS / 16
+        #if kt_df_rows%16 != 0:
+            #kt_df_rows += 1
+            #kt_df_rows=int(kt_df_rows)
+
+
+        ###
+        #self.df_da_page = self.df[ 0 :ROWS ].to_numpy()
+        self.start_row = start_row
+        self.ROWS = ROWS
+        return self.df[ self.start_row :self.start_row + self.ROWS ].to_numpy()
+        
+    def pg_down(self):
+        self.start_row +=1
+        return self.df[ self.start_row :self.start_row + self.ROWS ].to_numpy()
+
+    def pg_up(self):
+        self.start_row -=1
+        if self.start_row < 0:
+            self.start_row = self.df_rows - self.ROWS+1
+        return self.df[ self.start_row :self.start_row + self.ROWS ].to_numpy()
     def save_to_csv(self, name = '0ut'):
         self.df.to_csv(name +'.csv')
 
@@ -71,12 +99,13 @@ class DaFile:
 
 
 # testing...
-#fl = open('1.jpg', 'rb')
+fl = open('2.jpg', 'rb')
 
 
 #da_f = DaFile()
 #da_f.f_use(fl)
-#da_f.save_to_csv()
+#da_f.page_load(32)
 
+#fl .close()
 #print(da_f.df)
 #__________________________________
